@@ -11,7 +11,7 @@ Fun project to set up renting tools at Home Depot or Lowes.
 5. REST API only
 
 
-# Config
+## Config
 The application.properties file is stored in Git.  
 The rest are usually local files to prevent leaking sensitive information.
 
@@ -24,7 +24,9 @@ The rest are usually local files to prevent leaking sensitive information.
 
 ## Database
 Use Flyway to handle database schema changes.  The database schema is found in src/main/resources/db/migration.
+
 The developers use MySql.  QA/UAT/Production can use AWS or GCP databases.
+
 The Flyway configuration is part of the source code.  A real project would have the Jenkins pipeline overwrite the 
 config file or use `mvn -Dflyway.configFiles=customConfig.conf` to provide a configuration that developers never see.
 
@@ -41,7 +43,7 @@ Run the following command in a terminal window:
 mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
-# Test
+## Test
 
 run `mvn clean verify -Dspring.profiles.active=dev` to run all JUnit tests.
 
@@ -58,4 +60,11 @@ The dev profile opens all actuators.  The other environments only allow the heal
 
 Use http://localhost:8080/actuator with the dev profile to see all actuator links.
 
-Use [flyway](http://localhost:8080/actuator/flyway) to verify database migrations.
+Use [flyway actuator](http://localhost:8080/actuator/flyway) to verify database migrations.
+
+## Security
+There are multiple ways to handle making the application secure.
+* Use [Spring Boot security](https://spring.io/guides/gs/securing-web)
+* The UI could talk to Firebase to handle user authentication
+* Use OAuth or SAML
+* Roll your own framework and use the request filter chain to check for the presence of a valid header

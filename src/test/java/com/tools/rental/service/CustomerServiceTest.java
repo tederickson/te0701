@@ -3,6 +3,7 @@ package com.tools.rental.service;
 import com.tools.rental.domain.CreateCustomerRequest;
 import com.tools.rental.exception.InvalidRequestException;
 import com.tools.rental.exception.NotFoundException;
+import com.tools.rental.model.Customer;
 import com.tools.rental.repository.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,6 +62,16 @@ class CustomerServiceTest {
         var exception = assertThrows(InvalidRequestException.class, () -> customerService.createCustomer(request));
 
         assertThat(exception.getMessage(), is("Missing last name"));
+    }
+
+    @Test
+    void createCustomer_customerNotFound() {
+        when(customerRepository.findByPhone(PHONE)).thenReturn(Optional.of(new Customer()));
+
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "Bob", "Test");
+        var exception = assertThrows(InvalidRequestException.class, () -> customerService.createCustomer(request));
+
+        assertThat(exception.getMessage(), is("User exists."));
     }
 
     @ParameterizedTest

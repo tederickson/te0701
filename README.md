@@ -51,8 +51,8 @@ JaCoCo creates the [test coverage reports](./target/site/jacoco/index.html)
 
 The current test environment utilizes SpringBootTest, JsonTest and Mockito to achieve a 93% test coverage.
 
-## OpenApi (Swagger)
-Swagger provides the API documentation of the REST endpoints.  
+## OpenApi 3.0 (Swagger)
+Swagger/OpenApi provides the API documentation of the REST endpoints.  
 Run the application and point a browser to http://localhost:8080/swagger-ui.html
 
 ## Actuators

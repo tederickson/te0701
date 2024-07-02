@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Builder(setterPrefix = "with")
 @NoArgsConstructor
 @AllArgsConstructor
-public class CustomerDigest {
+public final class CustomerDigest {
     private long id;
     private String firstName;
     private String lastName;

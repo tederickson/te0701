@@ -16,6 +16,8 @@ public class PasswordValidator {
     private static final Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
 
     public static boolean isNotValid(final String password) {
+        if (password == null) {return true;}
+
         Matcher matcher = pattern.matcher(password);
         return !matcher.matches();
     }

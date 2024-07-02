@@ -43,7 +43,9 @@ mvn spring-boot:run -Dspring-boot.run.profiles=dev
 
 # Test
 
-run `mvn test -Dspring.profiles.active=dev` to run all JUnit tests.
+run `mvn clean verify -Dspring.profiles.active=dev` to run all JUnit tests.
+
+JaCoCo creates the [test coverage reports](./target/site/jacoco/index.html)
 
 The current test environment utilizes SpringBootTest, JsonTest and Mockito to achieve a 93% test coverage.
 

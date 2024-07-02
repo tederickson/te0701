@@ -31,6 +31,7 @@ public class CustomerService {
                 .setFirstName(request.firstName())
                 .setLastName(request.lastName())
                 .setPhone(request.phone())
+                .setEmail(request.email())
                 .setCreateDate(LocalDate.now())
                 .setStatus(CustomerStatus.NEW)
                 .setPassword("customer needs to change");

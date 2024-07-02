@@ -17,6 +17,7 @@ public final class CustomerDigest {
     private String firstName;
     private String lastName;
     private String phone;
+    private String email;
     private CustomerStatus status;
     private LocalDate createDate;
 }

@@ -14,6 +14,7 @@ public final class CustomerDigestMapper {
                 .withFirstName(customer.getFirstName())
                 .withLastName(customer.getLastName())
                 .withPhone(customer.getPhone())
+                .withEmail(customer.getEmail())
                 .withStatus(customer.getStatus())
                 .build();
     }

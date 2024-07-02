@@ -40,7 +40,7 @@ class CustomerControllerIT {
 
     @Test
     void createCustomer() {
-        CreateCustomerRequest request = new CreateCustomerRequest(phone, "first", "last");
+        CreateCustomerRequest request = new CreateCustomerRequest(phone, "first", "last", "email");
         CustomerDigest customer = client.createCustomer(request);
 
         validate(customer, "first", "last");
@@ -48,7 +48,7 @@ class CustomerControllerIT {
 
     @Test
     void createCustomer_invalidPhone() {
-        CreateCustomerRequest request = new CreateCustomerRequest("phone", "first", "last");
+        CreateCustomerRequest request = new CreateCustomerRequest("phone", "first", "last", "email");
 
         var exception = assertThrows(HttpClientErrorException.BadRequest.class, () -> client.createCustomer(request));
         assertThat(exception.getMessage(), containsString("Phone format"));
@@ -56,7 +56,7 @@ class CustomerControllerIT {
 
     @Test
     void createCustomer_customerExist() {
-        CreateCustomerRequest request = new CreateCustomerRequest("7195551234", "first", "last");
+        CreateCustomerRequest request = new CreateCustomerRequest("7195551234", "first", "last", "email");
 
         var exception = assertThrows(HttpClientErrorException.BadRequest.class, () -> client.createCustomer(request));
         assertThat(exception.getMessage(), containsString(RentalServiceError.EXISTING_USER.getMessage()));
@@ -64,7 +64,7 @@ class CustomerControllerIT {
 
     @Test
     void getCustomerByPhone() {
-        CreateCustomerRequest request = new CreateCustomerRequest(phone, "first1", "last1");
+        CreateCustomerRequest request = new CreateCustomerRequest(phone, "first1", "last1", "email");
         client.createCustomer(request);
 
         CustomerDigest customer = client.getCustomerByPhone(phone);
@@ -74,7 +74,7 @@ class CustomerControllerIT {
 
     @Test
     void changePassword() {
-        CreateCustomerRequest request = new CreateCustomerRequest(phone, "first", "last");
+        CreateCustomerRequest request = new CreateCustomerRequest(phone, "first", "last", "email");
         CustomerDigest customer = client.createCustomer(request);
 
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest("12AppleSauce!");
@@ -98,5 +98,6 @@ class CustomerControllerIT {
         assertThat(customer.getFirstName(), is(first));
         assertThat(customer.getLastName(), is(last));
         assertThat(customer.getStatus(), is(CustomerStatus.NEW));
+        assertThat(customer.getEmail(), is("email"));
     }
 }

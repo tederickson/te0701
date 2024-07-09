@@ -4,5 +4,8 @@ public record ToolCodeDigest(String toolCode,
                              String toolType,
                              String toolTypeDescription,
                              String brand,
-                             String brandDescription) {
+                             String brandDescription,
+                             Boolean weekdayCharge,
+                             Boolean weekendCharge,
+                             Boolean holidayCharge) {
 }

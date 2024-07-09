@@ -36,6 +36,11 @@ mvn flyway:clean    -- removes the database schema
 mvn flyway:migrate  -- create/update the database schema
 ```
 
+A store in Hawaii or New York charges more than a store in Oklahoma.  
+The store id is used as part of a composite index to retrieve the data for that store.
+Store administration is part of a separate project.
+
+
 ## Run the Application
 Run the following command in a terminal window:
 
@@ -68,3 +73,16 @@ There are multiple ways to handle making the application secure.
 * The UI could talk to Firebase to handle user authentication
 * Use OAuth or SAML
 * Roll your own framework and use the request filter chain to check for the presence of a valid header
+
+## Audit
+Auditing is a future requirement.
+
+Auditing can be achieved by either
+1. Placing an audit event on a message queue and a separate system handles the events
+2. Table data contains a create employee id, update employee id, create date and update date
+
+Unfortunately table data only shows the final time a row was updated.
+
+# Future Enhancements
+1. Provide a sale endpoint that allows a manager to reduce the price of a tool code for a specified period of days.
+2. Provide a tool maintenance/repair endpoint to allow temporary inventory reduction while a tool is in the shop.

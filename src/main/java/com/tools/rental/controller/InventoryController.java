@@ -52,8 +52,9 @@ public class InventoryController {
 
     @Operation(summary = "Delete store ToolType charge")
     @ApiResponses(value = { //
-            @ApiResponse(responseCode = "200", description = "Store ToolType charge deleted")})
+            @ApiResponse(responseCode = "204", description = "Store ToolType charge deleted")})
     @DeleteMapping(value = "/stores/{storeId}/{toolType}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteStoreToolTypeCharge(@PathVariable("storeId") final Short storeId,
                                           @PathVariable("toolType") final ToolType toolType) {
         inventoryService.deleteStoreToolTypeCharge(storeId, toolType);

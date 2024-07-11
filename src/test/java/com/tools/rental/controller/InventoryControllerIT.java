@@ -1,8 +1,10 @@
 package com.tools.rental.controller;
 
 import com.tools.rental.client.RentalClient;
+import com.tools.rental.domain.CheckoutRequest;
 import com.tools.rental.domain.CreateStoreToolTypeChargeRequest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
+import com.tools.rental.enumeration.ToolCode;
 import com.tools.rental.enumeration.ToolType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -80,5 +84,19 @@ class InventoryControllerIT {
         var exception = assertThrows(HttpClientErrorException.BadRequest.class,
                                      () -> client.createStoreToolTypeCharge(request));
         assertThat(exception.getMessage(), containsString("charge already exists"));
+    }
+
+    @Test
+    void toolRentalCheckout_invalidDiscount() {
+        LocalDate checkoutDate = LocalDate.of(2015, 9, 3);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy");
+        String dateString = checkoutDate.format(formatter);
+
+        assertThat(dateString, is("9/3/15"));
+
+        CheckoutRequest request = new CheckoutRequest(ToolCode.JAKR, checkoutDate, 5, 101, STORE_ID, null);
+        var exception = assertThrows(HttpClientErrorException.BadRequest.class,
+                                     () -> client.toolRentalCheckout(request));
+        assertThat(exception.getMessage(), containsString("Discount percent is not in the range 0 - 100%"));
     }
 }

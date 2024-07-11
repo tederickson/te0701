@@ -1,9 +1,11 @@
 package com.tools.rental.client;
 
 import com.tools.rental.domain.ChangePasswordRequest;
+import com.tools.rental.domain.CheckoutRequest;
 import com.tools.rental.domain.CreateCustomerRequest;
 import com.tools.rental.domain.CreateStoreToolTypeChargeRequest;
 import com.tools.rental.domain.CustomerDigest;
+import com.tools.rental.domain.RentalAgreementDigest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.domain.ToolCodeDigest;
 import com.tools.rental.enumeration.ToolType;
@@ -82,5 +84,14 @@ public class RentalClient {
                 .uri("/v1/inventory/stores/{storeId}/{toolType}", storeId, toolType)
                 .retrieve()
                 .toBodilessEntity();
+    }
+
+    public RentalAgreementDigest toolRentalCheckout(final CheckoutRequest request) {
+        return restClient.post()
+                .uri("/v1/inventory/checkout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(RentalAgreementDigest.class);
     }
 }

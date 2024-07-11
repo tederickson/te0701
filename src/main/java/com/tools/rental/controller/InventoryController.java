@@ -1,6 +1,8 @@
 package com.tools.rental.controller;
 
+import com.tools.rental.domain.CheckoutRequest;
 import com.tools.rental.domain.CreateStoreToolTypeChargeRequest;
+import com.tools.rental.domain.RentalAgreementDigest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.enumeration.ToolType;
 import com.tools.rental.exception.InvalidRequestException;
@@ -58,5 +60,16 @@ public class InventoryController {
     public void deleteStoreToolTypeCharge(@PathVariable("storeId") final Short storeId,
                                           @PathVariable("toolType") final ToolType toolType) {
         inventoryService.deleteStoreToolTypeCharge(storeId, toolType);
+    }
+
+    @Operation(summary = "Checkout tool rental")
+    @ApiResponses(value = { //
+            @ApiResponse(responseCode = "200", description = "Successfully created tool rental"), //
+            @ApiResponse(responseCode = "400", description = "Invalid request")})
+    @PostMapping(value = "/checkout", produces = "application/json")
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public RentalAgreementDigest toolRentalCheckout(@RequestBody final CheckoutRequest request)
+            throws InvalidRequestException {
+        return inventoryService.toolRentalCheckout(request);
     }
 }

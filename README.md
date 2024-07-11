@@ -38,8 +38,8 @@ mvn flyway:migrate  -- create/update the database schema
 
 A store in Hawaii or New York charges more than a store in Oklahoma.  
 The store id is used as part of a composite index to retrieve the data for that store.
-Store administration is part of a separate project.
 
+Store administration is not part of this project.
 
 ## Run the Application
 Run the following command in a terminal window:
@@ -81,7 +81,7 @@ Auditing can be achieved by either
 1. Placing an audit event on a message queue and a separate system handles the events
 2. Table data contains a create employee id, update employee id, create date and update date
 
-Unfortunately table data only shows the final time a row was updated.
+Unfortunately table data only shows the final time a row was updated.  Audit events are preferred.
 
 # Future Enhancements
 1. Provide a sale endpoint that allows a manager to reduce the price of a tool code for a specified period of days.

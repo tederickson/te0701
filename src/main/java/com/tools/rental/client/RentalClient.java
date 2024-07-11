@@ -3,7 +3,9 @@ package com.tools.rental.client;
 import com.tools.rental.domain.ChangePasswordRequest;
 import com.tools.rental.domain.CreateCustomerRequest;
 import com.tools.rental.domain.CustomerDigest;
+import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.domain.ToolCodeDigest;
+import com.tools.rental.enumeration.ToolType;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
@@ -56,5 +58,12 @@ public class RentalClient {
                 .body(changePasswordRequest)
                 .retrieve()
                 .toBodilessEntity();
+    }
+
+    public StoreToolTypeChargeDigest findByStoreIdAndToolType(final short storeId, final ToolType toolType) {
+        return restClient.get()
+                .uri("/v1/inventory/stores/{storeId}/{toolType}", storeId, toolType)
+                .retrieve()
+                .body(StoreToolTypeChargeDigest.class);
     }
 }

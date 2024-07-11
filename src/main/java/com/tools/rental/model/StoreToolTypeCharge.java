@@ -1,6 +1,6 @@
 package com.tools.rental.model;
 
-import com.tools.rental.enumeration.CustomerStatus;
+import com.tools.rental.enumeration.ToolType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,7 +14,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Getter
@@ -23,26 +23,20 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @Entity
-public class Customer {
+public class StoreToolTypeCharge {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false)
-    private String firstName;
-    @Column(nullable = false)
-    private String lastName;
-    @Column(nullable = false)
-    private String phone;
-    @Column(nullable = false)
-    private String password;
-    private String email;
+    private short storeId;
 
     @Enumerated(EnumType.STRING)
-    private CustomerStatus status;
+    @Column(nullable = false)
+    private ToolType toolType;
 
     @Column(nullable = false)
-    private LocalDate createDate;
+    private BigDecimal dailyCharge;
 
     @Override
     public boolean equals(Object o) {
@@ -52,8 +46,8 @@ public class Customer {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Customer customer = (Customer) o;
-        return id == customer.id;
+        StoreToolTypeCharge storeToolTypeCharge = (StoreToolTypeCharge) o;
+        return id == storeToolTypeCharge.id;
     }
 
     @Override

@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CustomerControllerIT {
-    final private String phone = "test phone";
+    final private static String PHONE = "test phone";
 
     @LocalServerPort
     private int port;
@@ -35,12 +35,12 @@ class CustomerControllerIT {
 
     @AfterEach
     void tearDown() {
-        client.deleteCustomerByPhone(phone);
+        client.deleteCustomerByPhone(PHONE);
     }
 
     @Test
     void createCustomer() {
-        CreateCustomerRequest request = new CreateCustomerRequest(phone, "first", "last", "email");
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first", "last", "email");
         CustomerDigest customer = client.createCustomer(request);
 
         validate(customer, "first", "last");
@@ -64,23 +64,23 @@ class CustomerControllerIT {
 
     @Test
     void getCustomerByPhone() {
-        CreateCustomerRequest request = new CreateCustomerRequest(phone, "first1", "last1", "email");
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first1", "last1", "email");
         client.createCustomer(request);
 
-        CustomerDigest customer = client.getCustomerByPhone(phone);
+        CustomerDigest customer = client.getCustomerByPhone(PHONE);
 
         validate(customer, "first1", "last1");
     }
 
     @Test
     void changePassword() {
-        CreateCustomerRequest request = new CreateCustomerRequest(phone, "first", "last", "email");
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first", "last", "email");
         CustomerDigest customer = client.createCustomer(request);
 
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest("12AppleSauce!");
         client.changePassword(customer.getId(), changePasswordRequest);
 
-        assertThat(client.getCustomerByPhone(phone).getStatus(), is(CustomerStatus.ACTIVE));
+        assertThat(client.getCustomerByPhone(PHONE).getStatus(), is(CustomerStatus.ACTIVE));
     }
 
     @Test
@@ -94,7 +94,7 @@ class CustomerControllerIT {
     private void validate(CustomerDigest customer, String first, String last) {
         assertThat(customer.getCreateDate(), is(notNullValue()));
         assertThat(customer.getId(), is(notNullValue()));
-        assertThat(customer.getPhone(), is(phone));
+        assertThat(customer.getPhone(), is(PHONE));
         assertThat(customer.getFirstName(), is(first));
         assertThat(customer.getLastName(), is(last));
         assertThat(customer.getStatus(), is(CustomerStatus.NEW));

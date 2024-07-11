@@ -2,6 +2,7 @@ package com.tools.rental.client;
 
 import com.tools.rental.domain.ChangePasswordRequest;
 import com.tools.rental.domain.CreateCustomerRequest;
+import com.tools.rental.domain.CreateStoreToolTypeChargeRequest;
 import com.tools.rental.domain.CustomerDigest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.domain.ToolCodeDigest;
@@ -63,6 +64,15 @@ public class RentalClient {
     public StoreToolTypeChargeDigest findByStoreIdAndToolType(final short storeId, final ToolType toolType) {
         return restClient.get()
                 .uri("/v1/inventory/stores/{storeId}/{toolType}", storeId, toolType)
+                .retrieve()
+                .body(StoreToolTypeChargeDigest.class);
+    }
+
+    public StoreToolTypeChargeDigest createStoreToolTypeCharge(final CreateStoreToolTypeChargeRequest request) {
+        return restClient.post()
+                .uri("/v1/inventory")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
                 .retrieve()
                 .body(StoreToolTypeChargeDigest.class);
     }

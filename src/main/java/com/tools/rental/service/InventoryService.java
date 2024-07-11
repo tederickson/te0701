@@ -1,7 +1,9 @@
 package com.tools.rental.service;
 
+import com.tools.rental.domain.CreateStoreToolTypeChargeRequest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.enumeration.ToolType;
+import com.tools.rental.exception.InvalidRequestException;
 import com.tools.rental.exception.NotFoundException;
 import com.tools.rental.mapper.StoreToolTypeChargeDigestMapper;
 import com.tools.rental.model.StoreToolTypeCharge;
@@ -20,5 +22,31 @@ public class InventoryService {
                                                                                                          toolType)
                 .orElseThrow(() -> new NotFoundException("toolType"));
         return StoreToolTypeChargeDigestMapper.map(storeToolTypeCharge);
+    }
+
+    public StoreToolTypeChargeDigest createStoreToolTypeCharge(final CreateStoreToolTypeChargeRequest request)
+            throws InvalidRequestException {
+        validate(request);
+
+        if (storeToolTypeChargeRepository.findByStoreIdAndToolType(request.storeId(), request.toolType()).isPresent()) {
+            throw new InvalidRequestException("charge already exists");
+        }
+
+        StoreToolTypeCharge storeToolTypeCharge = new StoreToolTypeCharge()
+                .setStoreId(request.storeId())
+                .setToolType(request.toolType())
+                .setDailyCharge(request.dailyCharge());
+
+        return StoreToolTypeChargeDigestMapper.map(storeToolTypeChargeRepository.save(storeToolTypeCharge));
+    }
+
+    private void validate(CreateStoreToolTypeChargeRequest request) throws InvalidRequestException {
+        if (request.storeId() == null) {throw new InvalidRequestException("Missing storeId");}
+        if (request.storeId() < 1) {throw new InvalidRequestException("Invalid storeId");}
+        if (request.toolType() == null) {throw new InvalidRequestException("Missing ToolType");}
+        if (request.dailyCharge() == null) {throw new InvalidRequestException("Missing daily charge");}
+
+        int dollars = request.dailyCharge().intValue();
+        if (dollars < 1) {throw new InvalidRequestException("Daily charge less than a dollar");}
     }
 }

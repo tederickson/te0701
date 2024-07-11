@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -68,6 +69,9 @@ public class InventoryService {
                 .withRentalDayCount(request.rentalDayCount())
                 .withCheckoutDate(request.checkoutDate())
                 .withDiscountPercent(request.discountPercent());
+
+        LocalDate dueDate = request.checkoutDate().plusDays(request.rentalDayCount() - 1);
+        rentalAgreementBuilder.withDueDate(dueDate);
 
         BigDecimal dailyCharge =
                 storeToolTypeChargeRepository.findByStoreIdAndToolType(request.storeId(), toolCode.getToolType())

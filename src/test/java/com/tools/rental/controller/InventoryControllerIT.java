@@ -129,6 +129,9 @@ class InventoryControllerIT {
 
         RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
         verify(request, rentalAgreement);
+
+        LocalDate dueDate = LocalDate.of(2000, 7, 2 + 3 - 1);
+        assertThat(rentalAgreement.getDueDate(), is(dueDate));
     }
 
     @Test

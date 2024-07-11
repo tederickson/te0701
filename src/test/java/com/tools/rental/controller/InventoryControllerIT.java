@@ -104,6 +104,15 @@ class InventoryControllerIT {
     }
 
     @Test
+    void toolRentalCheckout_maxRentalsNotFound() {
+        short storeId = 21;
+        CheckoutRequest request = new CheckoutRequest(ToolCode.JAKR, LocalDate.now(), 5, 0, storeId, null);
+        var exception = assertThrows(HttpClientErrorException.NotFound.class,
+                                     () -> client.toolRentalCheckout(request));
+        assertThat(exception.getMessage(), containsString("toolCode for store"));
+    }
+
+    @Test
     void toolRentalCheckout_invalidDiscount() {  // Test 1
         LocalDate checkoutDate = LocalDate.of(2015, 9, 3);
 

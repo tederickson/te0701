@@ -5,6 +5,7 @@ import com.tools.rental.domain.CreateStoreToolTypeChargeRequest;
 import com.tools.rental.enumeration.ToolCode;
 import com.tools.rental.enumeration.ToolType;
 import com.tools.rental.exception.InvalidRequestException;
+import com.tools.rental.repository.StoreToolInventoryRepository;
 import com.tools.rental.repository.StoreToolTypeChargeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,13 +22,14 @@ class InventoryServiceTest {
     private static final Short STORE_ID = 3;
     private static final LocalDate checkoutDate = LocalDate.of(2015, 9, 3);
 
-    private StoreToolTypeChargeRepository storeToolTypeChargeRepository;
     private InventoryService inventoryService;
 
     @BeforeEach
     void setUp() {
-        storeToolTypeChargeRepository = mock(StoreToolTypeChargeRepository.class);
-        inventoryService = new InventoryService(storeToolTypeChargeRepository);
+        StoreToolTypeChargeRepository storeToolTypeChargeRepository = mock(StoreToolTypeChargeRepository.class);
+        StoreToolInventoryRepository storeToolInventoryRepository = mock(StoreToolInventoryRepository.class);
+
+        inventoryService = new InventoryService(storeToolTypeChargeRepository, storeToolInventoryRepository);
     }
 
     @Test

@@ -9,7 +9,9 @@ import com.tools.rental.enumeration.ToolType;
 import com.tools.rental.exception.InvalidRequestException;
 import com.tools.rental.exception.NotFoundException;
 import com.tools.rental.mapper.StoreToolTypeChargeDigestMapper;
+import com.tools.rental.model.StoreToolInventory;
 import com.tools.rental.model.StoreToolTypeCharge;
+import com.tools.rental.repository.StoreToolInventoryRepository;
 import com.tools.rental.repository.StoreToolTypeChargeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import java.math.BigDecimal;
 @Transactional
 public class InventoryService {
     private final StoreToolTypeChargeRepository storeToolTypeChargeRepository;
+    private final StoreToolInventoryRepository storeToolInventoryRepository;
 
     public StoreToolTypeChargeDigest findByStoreIdAndToolType(final short storeId, final ToolType toolType)
             throws NotFoundException {
@@ -69,8 +72,12 @@ public class InventoryService {
         BigDecimal dailyCharge =
                 storeToolTypeChargeRepository.findByStoreIdAndToolType(request.storeId(), toolCode.getToolType())
                         .map(StoreToolTypeCharge::getDailyCharge)
-                        .orElseThrow(() -> new NotFoundException("toolType"));
+                        .orElseThrow(() -> new NotFoundException("toolType for store"));
         rentalAgreementBuilder.withDailyRentalCharge(dailyCharge);
+
+        short maxAvailable = storeToolInventoryRepository.findByStoreIdAndToolCode(request.storeId(), toolCode)
+                .map(StoreToolInventory::getMaxAvailable)
+                .orElseThrow(() -> new NotFoundException("toolCode for store"));
 
         return rentalAgreementBuilder.build();
     }

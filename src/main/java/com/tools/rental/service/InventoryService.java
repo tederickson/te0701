@@ -40,7 +40,13 @@ public class InventoryService {
         return StoreToolTypeChargeDigestMapper.map(storeToolTypeChargeRepository.save(storeToolTypeCharge));
     }
 
-    private void validate(CreateStoreToolTypeChargeRequest request) throws InvalidRequestException {
+    public void deleteStoreToolTypeCharge(final Short storeId, final ToolType toolType) {
+        final var storeToolTypeCharge = storeToolTypeChargeRepository.findByStoreIdAndToolType(storeId, toolType);
+
+        storeToolTypeCharge.ifPresent(storeToolTypeChargeRepository::delete);
+    }
+
+    private void validate(final CreateStoreToolTypeChargeRequest request) throws InvalidRequestException {
         if (request.storeId() == null) {throw new InvalidRequestException("Missing storeId");}
         if (request.storeId() < 1) {throw new InvalidRequestException("Invalid storeId");}
         if (request.toolType() == null) {throw new InvalidRequestException("Missing ToolType");}
@@ -49,4 +55,6 @@ public class InventoryService {
         int dollars = request.dailyCharge().intValue();
         if (dollars < 1) {throw new InvalidRequestException("Daily charge less than a dollar");}
     }
+
+
 }

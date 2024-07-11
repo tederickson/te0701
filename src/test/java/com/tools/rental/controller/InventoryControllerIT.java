@@ -59,12 +59,17 @@ class InventoryControllerIT {
         CreateStoreToolTypeChargeRequest request = new CreateStoreToolTypeChargeRequest(storeId,
                                                                                         ToolType.JACKHAMMER,
                                                                                         dailyCharge);
+
+        client.deleteStoreToolTypeCharge(storeId, ToolType.JACKHAMMER);
+
         StoreToolTypeChargeDigest storeToolTypeChargeDigest = client.createStoreToolTypeCharge(request);
 
         assertThat(storeToolTypeChargeDigest, is(notNullValue()));
         assertThat(storeToolTypeChargeDigest.getStoreId(), is(storeId));
         assertThat(storeToolTypeChargeDigest.getToolType(), is(ToolType.JACKHAMMER));
         assertThat(storeToolTypeChargeDigest.getDailyCharge(), is(dailyCharge));
+
+        client.deleteStoreToolTypeCharge(storeId, ToolType.JACKHAMMER);
     }
 
     @Test

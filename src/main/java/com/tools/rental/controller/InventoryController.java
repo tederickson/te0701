@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "Inventory API")
 @RequestMapping("v1/inventory")
-@Slf4j
 public class InventoryController {
     private final InventoryService inventoryService;
 
@@ -37,7 +36,6 @@ public class InventoryController {
     public StoreToolTypeChargeDigest findByStoreIdAndToolType(@PathVariable("storeId") final Short storeId,
                                                               @PathVariable("toolType") final ToolType toolType)
             throws NotFoundException {
-        log.info("storeId = {}, toolType = {}", storeId, toolType);
         return inventoryService.findByStoreIdAndToolType(storeId, toolType);
     }
 
@@ -50,5 +48,14 @@ public class InventoryController {
     public StoreToolTypeChargeDigest createStoreToolTypeCharge(@RequestBody final CreateStoreToolTypeChargeRequest request)
             throws InvalidRequestException {
         return inventoryService.createStoreToolTypeCharge(request);
+    }
+
+    @Operation(summary = "Delete store ToolType charge")
+    @ApiResponses(value = { //
+            @ApiResponse(responseCode = "200", description = "Store ToolType charge deleted")})
+    @DeleteMapping(value = "/stores/{storeId}/{toolType}")
+    public void deleteStoreToolTypeCharge(@PathVariable("storeId") final Short storeId,
+                                          @PathVariable("toolType") final ToolType toolType) {
+        inventoryService.deleteStoreToolTypeCharge(storeId, toolType);
     }
 }

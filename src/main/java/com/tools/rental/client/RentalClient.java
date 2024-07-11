@@ -76,4 +76,11 @@ public class RentalClient {
                 .retrieve()
                 .body(StoreToolTypeChargeDigest.class);
     }
+
+    public void deleteStoreToolTypeCharge(final short storeId, final ToolType toolType) {
+        restClient.delete()
+                .uri("/v1/inventory/stores/{storeId}/{toolType}", storeId, toolType)
+                .retrieve()
+                .toBodilessEntity();
+    }
 }

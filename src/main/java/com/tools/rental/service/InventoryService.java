@@ -10,8 +10,10 @@ import com.tools.rental.exception.InvalidRequestException;
 import com.tools.rental.exception.NotFoundException;
 import com.tools.rental.mapper.StoreToolTypeChargeDigestMapper;
 import com.tools.rental.model.StoreToolInventory;
+import com.tools.rental.model.StoreToolRental;
 import com.tools.rental.model.StoreToolTypeCharge;
 import com.tools.rental.repository.StoreToolInventoryRepository;
+import com.tools.rental.repository.StoreToolRentalRepository;
 import com.tools.rental.repository.StoreToolTypeChargeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import java.time.LocalDate;
 public class InventoryService {
     private final StoreToolTypeChargeRepository storeToolTypeChargeRepository;
     private final StoreToolInventoryRepository storeToolInventoryRepository;
+    private final StoreToolRentalRepository storeToolRentalRepository;
 
     public StoreToolTypeChargeDigest findByStoreIdAndToolType(final short storeId, final ToolType toolType)
             throws NotFoundException {
@@ -79,9 +82,30 @@ public class InventoryService {
                         .orElseThrow(() -> new NotFoundException("toolType for store"));
         rentalAgreementBuilder.withDailyRentalCharge(dailyCharge);
 
-        short maxAvailable = storeToolInventoryRepository.findByStoreIdAndToolCode(request.storeId(), toolCode)
+        int maxAvailable = storeToolInventoryRepository.findByStoreIdAndToolCode(request.storeId(), toolCode)
                 .map(StoreToolInventory::getMaxAvailable)
                 .orElseThrow(() -> new NotFoundException("toolCode for store"));
+
+        for (int day = 0; day < request.rentalDayCount(); day++) {
+            LocalDate checkoutDate = request.checkoutDate().plusDays(day);
+            int rentals = storeToolRentalRepository.findByStoreIdAndToolCodeAndCheckoutDate(request.storeId(),
+                                                                                            toolCode,
+                                                                                            checkoutDate)
+                    .stream()
+                    .mapToInt(StoreToolRental::getAmount)
+                    .sum();
+            if (rentals + 1 > maxAvailable) {
+                throw new InvalidRequestException(rentals + " already checked out on " + checkoutDate);
+            }
+
+            StoreToolRental storeToolRental = new StoreToolRental()
+                    .setToolCode(toolCode)
+                    .setCheckoutDate(checkoutDate)
+                    .setStoreId(request.storeId())
+                    .setAmount((short) 1)
+                    .setCustomerId(request.customerId());
+            storeToolRentalRepository.save(storeToolRental);
+        }
 
         return rentalAgreementBuilder.build();
     }

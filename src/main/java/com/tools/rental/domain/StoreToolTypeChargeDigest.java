@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @Builder(setterPrefix = "with")
 @NoArgsConstructor
 @AllArgsConstructor
-public class StoreToolTypeChargeDigest {
+public final class StoreToolTypeChargeDigest {
     private Long id;
     private Short storeId;
     private ToolType toolType;

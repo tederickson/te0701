@@ -4,6 +4,7 @@ import com.tools.rental.domain.CheckoutRequest;
 import com.tools.rental.domain.CreateStoreToolTypeChargeRequest;
 import com.tools.rental.domain.RentalAgreementDigest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
+import com.tools.rental.enumeration.ToolCode;
 import com.tools.rental.enumeration.ToolType;
 import com.tools.rental.exception.InvalidRequestException;
 import com.tools.rental.exception.NotFoundException;
@@ -12,9 +13,13 @@ import com.tools.rental.model.StoreToolTypeCharge;
 import com.tools.rental.repository.StoreToolTypeChargeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class InventoryService {
     private final StoreToolTypeChargeRepository storeToolTypeChargeRepository;
 
@@ -48,10 +53,24 @@ public class InventoryService {
         storeToolTypeCharge.ifPresent(storeToolTypeChargeRepository::delete);
     }
 
-    public RentalAgreementDigest toolRentalCheckout(final CheckoutRequest request) throws InvalidRequestException {
+    public RentalAgreementDigest toolRentalCheckout(final CheckoutRequest request)
+            throws InvalidRequestException, NotFoundException {
         validate(request);
 
-        final var rentalAgreementBuilder = RentalAgreementDigest.builder();
+        final ToolCode toolCode = request.toolCode();
+        final var rentalAgreementBuilder = RentalAgreementDigest.builder()
+                .withToolCode(toolCode)
+                .withToolType(toolCode.getToolType())
+                .withToolBrand(toolCode.getBrand())
+                .withRentalDayCount(request.rentalDayCount())
+                .withCheckoutDate(request.checkoutDate());
+
+        BigDecimal dailyCharge =
+                storeToolTypeChargeRepository.findByStoreIdAndToolType(request.storeId(), toolCode.getToolType())
+                        .map(StoreToolTypeCharge::getDailyCharge)
+                        .orElseThrow(() -> new NotFoundException("toolType"));
+        rentalAgreementBuilder.withDailyRentalCharge(dailyCharge);
+
         return rentalAgreementBuilder.build();
     }
 

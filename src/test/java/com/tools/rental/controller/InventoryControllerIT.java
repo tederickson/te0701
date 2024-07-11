@@ -3,6 +3,7 @@ package com.tools.rental.controller;
 import com.tools.rental.client.RentalClient;
 import com.tools.rental.domain.CheckoutRequest;
 import com.tools.rental.domain.CreateStoreToolTypeChargeRequest;
+import com.tools.rental.domain.RentalAgreementDigest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.enumeration.ToolCode;
 import com.tools.rental.enumeration.ToolType;
@@ -87,16 +88,82 @@ class InventoryControllerIT {
     }
 
     @Test
-    void toolRentalCheckout_invalidDiscount() {
+    void toolRentalCheckout_storeIdNotFound() {
         LocalDate checkoutDate = LocalDate.of(2015, 9, 3);
+        short storeId = 33;
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy");
         String dateString = checkoutDate.format(formatter);
 
         assertThat(dateString, is("9/3/15"));
 
+        CheckoutRequest request = new CheckoutRequest(ToolCode.JAKR, checkoutDate, 5, 0, storeId, null);
+        var exception = assertThrows(HttpClientErrorException.NotFound.class,
+                                     () -> client.toolRentalCheckout(request));
+        assertThat(exception.getMessage(), containsString("toolType"));
+    }
+
+    @Test
+    void toolRentalCheckout_invalidDiscount() {  // Test 1
+        LocalDate checkoutDate = LocalDate.of(2015, 9, 3);
+
         CheckoutRequest request = new CheckoutRequest(ToolCode.JAKR, checkoutDate, 5, 101, STORE_ID, null);
         var exception = assertThrows(HttpClientErrorException.BadRequest.class,
                                      () -> client.toolRentalCheckout(request));
         assertThat(exception.getMessage(), containsString("Discount percent is not in the range 0 - 100%"));
+    }
+
+    @Test
+    void toolRentalCheckout_julyHoliday() {  // Test 2
+        LocalDate checkoutDate = LocalDate.of(2000, 7, 2);
+        CheckoutRequest request = new CheckoutRequest(ToolCode.LADW, checkoutDate, 3, 10, STORE_ID, null);
+
+        RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
+        verify(request, rentalAgreement);
+    }
+
+    @Test
+    void toolRentalCheckout_julyHolidayOnSaturday() {  // Test 3
+        LocalDate checkoutDate = LocalDate.of(2015, 7, 2);
+        CheckoutRequest request = new CheckoutRequest(ToolCode.CHNS, checkoutDate, 5, 25, STORE_ID, null);
+
+        RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
+        verify(request, rentalAgreement);
+    }
+
+    @Test
+    void toolRentalCheckout_LaborDay() {  // Test 4
+        LocalDate checkoutDate = LocalDate.of(2015, 9, 3);
+        CheckoutRequest request = new CheckoutRequest(ToolCode.JAKD, checkoutDate, 6, 0, STORE_ID, null);
+
+        RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
+        verify(request, rentalAgreement);
+    }
+
+    @Test
+    void toolRentalCheckout_BeforeLaborDay() {  // Test 5
+        LocalDate checkoutDate = LocalDate.of(2015, 7, 2);
+        CheckoutRequest request = new CheckoutRequest(ToolCode.JAKR, checkoutDate, 9, 0, STORE_ID, null);
+
+        RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
+        verify(request, rentalAgreement);
+    }
+
+    @Test
+    void toolRentalCheckout_julyHoliday6() {  // Test 6
+        LocalDate checkoutDate = LocalDate.of(2000, 7, 2);
+        CheckoutRequest request = new CheckoutRequest(ToolCode.JAKR, checkoutDate, 4, 50, STORE_ID, null);
+
+        RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
+        verify(request, rentalAgreement);
+    }
+
+    private void verify(final CheckoutRequest request, final RentalAgreementDigest rentalAgreement) {
+        ToolCode toolCode = request.toolCode();
+        assertThat(rentalAgreement.getToolCode(), is(toolCode));
+        assertThat(rentalAgreement.getToolType(), is(toolCode.getToolType()));
+        assertThat(rentalAgreement.getToolBrand(), is(toolCode.getBrand()));
+        assertThat(rentalAgreement.getRentalDayCount(), is(request.rentalDayCount()));
+        assertThat(rentalAgreement.getCheckoutDate(), is(request.checkoutDate()));
     }
 }

@@ -65,11 +65,12 @@ public class InventoryController {
     @Operation(summary = "Checkout tool rental")
     @ApiResponses(value = { //
             @ApiResponse(responseCode = "200", description = "Successfully created tool rental"), //
-            @ApiResponse(responseCode = "400", description = "Invalid request")})
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "404", description = "store ToolType charge not found")})
     @PostMapping(value = "/checkout", produces = "application/json")
     @ResponseStatus(code = HttpStatus.CREATED)
     public RentalAgreementDigest toolRentalCheckout(@RequestBody final CheckoutRequest request)
-            throws InvalidRequestException {
+            throws InvalidRequestException, NotFoundException {
         return inventoryService.toolRentalCheckout(request);
     }
 }

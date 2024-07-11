@@ -63,7 +63,8 @@ public class InventoryService {
                 .withToolType(toolCode.getToolType())
                 .withToolBrand(toolCode.getBrand())
                 .withRentalDayCount(request.rentalDayCount())
-                .withCheckoutDate(request.checkoutDate());
+                .withCheckoutDate(request.checkoutDate())
+                .withDiscountPercent(request.discountPercent());
 
         BigDecimal dailyCharge =
                 storeToolTypeChargeRepository.findByStoreIdAndToolType(request.storeId(), toolCode.getToolType())

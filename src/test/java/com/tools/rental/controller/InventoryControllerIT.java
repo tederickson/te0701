@@ -165,5 +165,6 @@ class InventoryControllerIT {
         assertThat(rentalAgreement.getToolBrand(), is(toolCode.getBrand()));
         assertThat(rentalAgreement.getRentalDayCount(), is(request.rentalDayCount()));
         assertThat(rentalAgreement.getCheckoutDate(), is(request.checkoutDate()));
+        assertThat(rentalAgreement.getDiscountPercent(), is(request.discountPercent()));
     }
 }

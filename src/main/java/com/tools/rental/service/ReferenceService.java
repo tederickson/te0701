@@ -18,14 +18,16 @@ public class ReferenceService {
             final ToolType toolType = toolCode.getToolType();
             final Brand brand = toolCode.getBrand();
 
-            toolCodeDigests.add(new ToolCodeDigest(toolCode.name(),
-                                                   toolType.name(),
-                                                   toolType.getDescription(),
-                                                   brand.name(),
-                                                   brand.getDescription(),
-                                                   toolType.getWeekdayCharge(),
-                                                   toolType.getWeekendCharge(),
-                                                   toolType.getHolidayCharge()));
+            toolCodeDigests.add(ToolCodeDigest.builder()
+                                        .withToolCode(toolCode.name())
+                                        .withToolType(toolType.name())
+                                        .withToolTypeDescription(toolType.getDescription())
+                                        .withWeekdayCharge(toolType.getWeekdayCharge())
+                                        .withWeekendCharge(toolType.getWeekendCharge())
+                                        .withHolidayCharge(toolType.getHolidayCharge())
+                                        .withBrand(brand.name())
+                                        .withBrandDescription(brand.getDescription())
+                                        .build());
         }
         return toolCodeDigests;
     }

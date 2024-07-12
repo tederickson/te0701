@@ -7,8 +7,11 @@ import com.tools.rental.domain.RentalAgreementDigest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.enumeration.ToolCode;
 import com.tools.rental.enumeration.ToolType;
+import com.tools.rental.repository.StoreToolRentalRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.web.client.HttpClientErrorException;
@@ -30,6 +33,9 @@ class InventoryControllerIT {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private StoreToolRentalRepository storeToolRentalRepository;
+
     private RentalClient client;
 
     @BeforeEach
@@ -37,6 +43,10 @@ class InventoryControllerIT {
         client = new RentalClient("localhost", port);
     }
 
+    @AfterEach
+    void tearDown() {
+        storeToolRentalRepository.deleteAll();
+    }
 
     @Test
     void findByStoreIdAndToolType() {

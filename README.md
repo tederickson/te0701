@@ -56,6 +56,14 @@ JaCoCo creates the [test coverage reports](./target/site/jacoco/index.html)
 
 The current test environment utilizes SpringBootTest, JsonTest and Mockito to achieve a 93% test coverage.
 
+### IntelliJ Configuration
+Edit the JUnit test configuration so that tests automatically add the active Spring profile:
+
+1. Click on "Edit Configurations"
+2. Click on "Edit configuration templates ..."
+3. Chose JUnit
+4. Add "spring.profiles.active=dev" to the environment variables
+
 ## OpenApi 3.0 (Swagger)
 Swagger/OpenApi provides the API documentation of the REST endpoints.  
 Run the application and point a browser to http://localhost:8080/swagger-ui.html

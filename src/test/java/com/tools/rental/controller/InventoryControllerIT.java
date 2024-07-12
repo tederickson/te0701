@@ -146,6 +146,9 @@ class InventoryControllerIT {
         // 7/3/2000 Monday
         // 7/4/2000 Holiday -- no charge
         assertThat(rentalAgreement.getChargeDays(), is(2));
+        assertThat(rentalAgreement.getPreDiscountCharge(), is(new BigDecimal("3.98")));
+        assertThat(rentalAgreement.getDiscountAmount(), is(new BigDecimal("0.40")));
+        assertThat(rentalAgreement.getFinalCharge(), is(new BigDecimal("3.58")));
     }
 
     @Test
@@ -165,6 +168,9 @@ class InventoryControllerIT {
         // 7/5/2015 Sunday -- no charge
         // 7/6/2015 Monday
         assertThat(rentalAgreement.getChargeDays(), is(3));
+        assertThat(rentalAgreement.getPreDiscountCharge(), is(new BigDecimal("4.47")));
+        assertThat(rentalAgreement.getDiscountAmount(), is(new BigDecimal("1.12")));
+        assertThat(rentalAgreement.getFinalCharge(), is(new BigDecimal("3.35")));
     }
 
     @Test
@@ -185,6 +191,9 @@ class InventoryControllerIT {
         // 9/7/2015 Holiday -- no charge
         // 9/8/2015 Tuesday
         assertThat(rentalAgreement.getChargeDays(), is(3));
+        assertThat(rentalAgreement.getPreDiscountCharge(), is(new BigDecimal("8.97")));
+        assertThat(rentalAgreement.getDiscountAmount(), is(new BigDecimal("0.00")));
+        assertThat(rentalAgreement.getFinalCharge(), is(new BigDecimal("8.97")));
     }
 
     @Test
@@ -208,6 +217,9 @@ class InventoryControllerIT {
         // 7/9/2015 Thursday
         // 7/10/2015 Friday
         assertThat(rentalAgreement.getChargeDays(), is(6));
+        assertThat(rentalAgreement.getPreDiscountCharge(), is(new BigDecimal("17.94")));
+        assertThat(rentalAgreement.getDiscountAmount(), is(new BigDecimal("0.00")));
+        assertThat(rentalAgreement.getFinalCharge(), is(new BigDecimal("17.94")));
     }
 
     @Test
@@ -225,6 +237,9 @@ class InventoryControllerIT {
         // 7/4/2000 Holiday -- no charge
         // 7/5/2000 Wednesday
         assertThat(rentalAgreement.getChargeDays(), is(2));
+        assertThat(rentalAgreement.getPreDiscountCharge(), is(new BigDecimal("5.98")));
+        assertThat(rentalAgreement.getDiscountAmount(), is(new BigDecimal("2.99")));
+        assertThat(rentalAgreement.getFinalCharge(), is(new BigDecimal("2.99")));
     }
 
     private void verify(final CheckoutRequest request, final RentalAgreementDigest rentalAgreement) {

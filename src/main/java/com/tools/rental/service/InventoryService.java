@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
@@ -29,9 +30,75 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class InventoryService {
+    public static final int COST_SCALE = 2;
+
     private final StoreToolTypeChargeRepository storeToolTypeChargeRepository;
     private final StoreToolInventoryRepository storeToolInventoryRepository;
     private final StoreToolRentalRepository storeToolRentalRepository;
+
+    private static void calculateTotals(final CheckoutRequest request,
+                                        final RentalAgreementDigest.RentalAgreementDigestBuilder rentalAgreementBuilder,
+                                        final int chargeDays,
+                                        final BigDecimal dailyCharge) {
+        rentalAgreementBuilder.withChargeDays(chargeDays);
+
+        BigDecimal quantity = BigDecimal.valueOf(chargeDays);
+        BigDecimal preDiscountCharge = quantity.multiply(dailyCharge).setScale(COST_SCALE, RoundingMode.HALF_UP);
+        BigDecimal discountPercent = BigDecimal.valueOf(request.discountPercent()).movePointLeft(2);
+        BigDecimal discountAmount = discountPercent.multiply(preDiscountCharge)
+                .setScale(COST_SCALE, RoundingMode.HALF_UP);
+        BigDecimal finalCharge = preDiscountCharge.subtract(discountAmount).setScale(COST_SCALE, RoundingMode.HALF_UP);
+
+        rentalAgreementBuilder.withPreDiscountCharge(preDiscountCharge)
+                .withDiscountAmount(discountAmount)
+                .withFinalCharge(finalCharge);
+    }
+
+    private static boolean isChargeable(final ToolType toolType,
+                                        final LocalDate checkoutDate,
+                                        final List<LocalDate> holidays) {
+        DayOfWeek day = DayOfWeek.of(checkoutDate.get(ChronoField.DAY_OF_WEEK));
+
+        if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
+            return toolType.getWeekendCharge();
+        }
+
+        if (holidays.contains(checkoutDate)) {
+            return toolType.getHolidayCharge();
+        }
+
+        return toolType.getWeekdayCharge();
+    }
+
+    private static void validate(final CheckoutRequest request) throws InvalidRequestException {
+        if (request.rentalDayCount() < 1) {
+            throw new InvalidRequestException("Must rent tool for at least one day");
+        }
+        if (request.discountPercent() < 0 || request.discountPercent() > 100) {
+            throw new InvalidRequestException("Discount percent is not in the range 0 - 100%");
+        }
+        if (request.checkoutDate() == null) {
+            throw new InvalidRequestException("Missing checkout date");
+        }
+        if (request.toolCode() == null) {
+            throw new InvalidRequestException("Missing ToolCode");
+        }
+        validateStoreId(request.storeId());
+    }
+
+    private static void validate(final CreateStoreToolTypeChargeRequest request) throws InvalidRequestException {
+        validateStoreId(request.storeId());
+        if (request.toolType() == null) {throw new InvalidRequestException("Missing ToolType");}
+        if (request.dailyCharge() == null) {throw new InvalidRequestException("Missing daily charge");}
+
+        int dollars = request.dailyCharge().intValue();
+        if (dollars < 1) {throw new InvalidRequestException("Daily charge less than a dollar");}
+    }
+
+    private static void validateStoreId(final Short storeId) throws InvalidRequestException {
+        if (storeId == null) {throw new InvalidRequestException("Missing storeId");}
+        if (storeId < 1) {throw new InvalidRequestException("Invalid storeId");}
+    }
 
     public StoreToolTypeChargeDigest findByStoreIdAndToolType(final short storeId, final ToolType toolType)
             throws NotFoundException {
@@ -109,26 +176,9 @@ public class InventoryService {
                 chargeDays++;
             }
         }
-        rentalAgreementBuilder.withChargeDays(chargeDays);
+        calculateTotals(request, rentalAgreementBuilder, chargeDays, dailyCharge);
 
         return rentalAgreementBuilder.build();
-    }
-
-
-    private boolean isChargeable(final ToolType toolType,
-                                 final LocalDate checkoutDate,
-                                 final List<LocalDate> holidays) {
-        DayOfWeek day = DayOfWeek.of(checkoutDate.get(ChronoField.DAY_OF_WEEK));
-
-        if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
-            return toolType.getWeekendCharge();
-        }
-
-        if (holidays.contains(checkoutDate)) {
-            return toolType.getHolidayCharge();
-        }
-
-        return toolType.getWeekdayCharge();
     }
 
     private void verifyToolAvailable(final CheckoutRequest request,
@@ -144,35 +194,5 @@ public class InventoryService {
         if (rentals + 1 > maxAvailable) {
             throw new InvalidRequestException(rentals + " already checked out on " + checkoutDate);
         }
-    }
-
-    private void validate(final CheckoutRequest request) throws InvalidRequestException {
-        if (request.rentalDayCount() < 1) {
-            throw new InvalidRequestException("Must rent tool for at least one day");
-        }
-        if (request.discountPercent() < 0 || request.discountPercent() > 100) {
-            throw new InvalidRequestException("Discount percent is not in the range 0 - 100%");
-        }
-        if (request.checkoutDate() == null) {
-            throw new InvalidRequestException("Missing checkout date");
-        }
-        if (request.toolCode() == null) {
-            throw new InvalidRequestException("Missing ToolCode");
-        }
-        validateStoreId(request.storeId());
-    }
-
-    private void validate(final CreateStoreToolTypeChargeRequest request) throws InvalidRequestException {
-        validateStoreId(request.storeId());
-        if (request.toolType() == null) {throw new InvalidRequestException("Missing ToolType");}
-        if (request.dailyCharge() == null) {throw new InvalidRequestException("Missing daily charge");}
-
-        int dollars = request.dailyCharge().intValue();
-        if (dollars < 1) {throw new InvalidRequestException("Daily charge less than a dollar");}
-    }
-
-    private void validateStoreId(final Short storeId) throws InvalidRequestException {
-        if (storeId == null) {throw new InvalidRequestException("Missing storeId");}
-        if (storeId < 1) {throw new InvalidRequestException("Invalid storeId");}
     }
 }

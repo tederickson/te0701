@@ -8,11 +8,14 @@ import com.tools.rental.enumeration.ToolCode;
 import com.tools.rental.enumeration.ToolType;
 import com.tools.rental.exception.InvalidRequestException;
 import com.tools.rental.exception.NotFoundException;
+import com.tools.rental.mapper.RentalAgreementDigestMapper;
 import com.tools.rental.mapper.StoreToolTypeChargeDigestMapper;
 import com.tools.rental.model.StoreToolInventory;
 import com.tools.rental.model.StoreToolRental;
+import com.tools.rental.model.StoreToolRentalLedger;
 import com.tools.rental.model.StoreToolTypeCharge;
 import com.tools.rental.repository.StoreToolInventoryRepository;
+import com.tools.rental.repository.StoreToolRentalLedgerRepository;
 import com.tools.rental.repository.StoreToolRentalRepository;
 import com.tools.rental.repository.StoreToolTypeChargeRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +38,7 @@ public class InventoryService {
     private final StoreToolTypeChargeRepository storeToolTypeChargeRepository;
     private final StoreToolInventoryRepository storeToolInventoryRepository;
     private final StoreToolRentalRepository storeToolRentalRepository;
+    private final StoreToolRentalLedgerRepository storeToolRentalLedgerRepository;
 
     private static void calculateTotals(final CheckoutRequest request,
                                         final RentalAgreementDigest.RentalAgreementDigestBuilder rentalAgreementBuilder,
@@ -178,7 +182,12 @@ public class InventoryService {
         }
         calculateTotals(request, rentalAgreementBuilder, chargeDays, dailyCharge);
 
-        return rentalAgreementBuilder.build();
+        RentalAgreementDigest rentalAgreementDigest = rentalAgreementBuilder.build();
+        StoreToolRentalLedger storeToolRentalLedger =
+                RentalAgreementDigestMapper.toStoreToolRentalLedger(rentalAgreementDigest, request);
+        storeToolRentalLedgerRepository.save(storeToolRentalLedger);
+
+        return rentalAgreementDigest;
     }
 
     private void verifyToolAvailable(final CheckoutRequest request,

@@ -7,6 +7,7 @@ import com.tools.rental.domain.RentalAgreementDigest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.enumeration.ToolCode;
 import com.tools.rental.enumeration.ToolType;
+import com.tools.rental.repository.StoreToolRentalLedgerRepository;
 import com.tools.rental.repository.StoreToolRentalRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,8 @@ class InventoryControllerIT {
 
     @Autowired
     private StoreToolRentalRepository storeToolRentalRepository;
+    @Autowired
+    private StoreToolRentalLedgerRepository storeToolRentalLedgerRepository;
 
     private RentalClient client;
 
@@ -56,6 +59,7 @@ class InventoryControllerIT {
     @AfterEach
     void tearDown() {
         storeToolRentalRepository.deleteAll();
+        storeToolRentalLedgerRepository.deleteAll();
     }
 
     @Test

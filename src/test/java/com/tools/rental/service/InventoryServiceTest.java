@@ -6,6 +6,7 @@ import com.tools.rental.enumeration.ToolCode;
 import com.tools.rental.enumeration.ToolType;
 import com.tools.rental.exception.InvalidRequestException;
 import com.tools.rental.repository.StoreToolInventoryRepository;
+import com.tools.rental.repository.StoreToolRentalLedgerRepository;
 import com.tools.rental.repository.StoreToolRentalRepository;
 import com.tools.rental.repository.StoreToolTypeChargeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,10 +31,12 @@ class InventoryServiceTest {
         StoreToolTypeChargeRepository storeToolTypeChargeRepository = mock(StoreToolTypeChargeRepository.class);
         StoreToolInventoryRepository storeToolInventoryRepository = mock(StoreToolInventoryRepository.class);
         StoreToolRentalRepository storeToolRentalRepository = mock(StoreToolRentalRepository.class);
+        StoreToolRentalLedgerRepository storeToolRentalLedgerRepository = mock(StoreToolRentalLedgerRepository.class);
 
         inventoryService = new InventoryService(storeToolTypeChargeRepository,
                                                 storeToolInventoryRepository,
-                                                storeToolRentalRepository);
+                                                storeToolRentalRepository,
+                                                storeToolRentalLedgerRepository);
     }
 
     @Test

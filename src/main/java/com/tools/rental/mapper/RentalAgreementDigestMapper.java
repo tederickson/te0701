@@ -1,7 +1,9 @@
 package com.tools.rental.mapper;
 
+import com.tools.rental.domain.CheckoutRequest;
 import com.tools.rental.domain.RentalAgreementDigest;
 import com.tools.rental.exception.InvalidRequestException;
+import com.tools.rental.model.StoreToolRentalLedger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
@@ -77,5 +79,22 @@ public class RentalAgreementDigestMapper {
     private static String currency(BigDecimal money) {
         NumberFormat currencyInstance = NumberFormat.getCurrencyInstance(Locale.US);
         return currencyInstance.format(money.doubleValue());
+    }
+
+    public static StoreToolRentalLedger toStoreToolRentalLedger(final RentalAgreementDigest rentalAgreementDigest,
+                                                                final CheckoutRequest request) {
+        return new StoreToolRentalLedger()
+                .setStoreId(request.storeId())
+                .setCustomerId(request.customerId())
+                .setToolCode(request.toolCode())
+                .setCheckoutDate(request.checkoutDate())
+                .setRentalDayCount(request.rentalDayCount())
+                .setDueDate(rentalAgreementDigest.getDueDate())
+                .setDailyRentalCharge(rentalAgreementDigest.getDailyRentalCharge())
+                .setChargeDays(rentalAgreementDigest.getChargeDays())
+                .setPreDiscountCharge(rentalAgreementDigest.getPreDiscountCharge())
+                .setDiscountPercent(rentalAgreementDigest.getDiscountPercent())
+                .setDiscountAmount(rentalAgreementDigest.getDiscountAmount())
+                .setFinalCharge(rentalAgreementDigest.getFinalCharge());
     }
 }

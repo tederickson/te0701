@@ -43,6 +43,7 @@ public class CustomerController {
             @ApiResponse(responseCode = "200", description = "Get customer"), //
             @ApiResponse(responseCode = "404", description = "Customer not found")})
     @GetMapping(value = "/{phone}", produces = "application/json")
+    @ResponseStatus(code = HttpStatus.OK)
     public CustomerDigest getCustomerByPhone(@PathVariable("phone") final String phone)
             throws InvalidRequestException, NotFoundException {
         return customerService.getCustomerByPhone(phone);
@@ -50,8 +51,9 @@ public class CustomerController {
 
     @Operation(summary = "Delete Customer")
     @ApiResponses(value = { //
-            @ApiResponse(responseCode = "200", description = "Customer deleted")})
+            @ApiResponse(responseCode = "204", description = "Customer deleted")})
     @DeleteMapping(value = "/{phone}")
+    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteCustomer(@PathVariable("phone") final String phone) throws InvalidRequestException {
         customerService.deleteCustomerByPhone(phone);
     }
@@ -62,6 +64,7 @@ public class CustomerController {
             @ApiResponse(responseCode = "400", description = "Invalid password"), //
             @ApiResponse(responseCode = "404", description = "Customer not found")})
     @PostMapping(value = "/{id}/change-password")
+    @ResponseStatus(code = HttpStatus.OK)
     public void changePassword(@PathVariable("id") long id, @RequestBody ChangePasswordRequest request)
             throws InvalidRequestException, NotFoundException {
         customerService.changePassword(id, request.password());

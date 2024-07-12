@@ -94,4 +94,13 @@ public class RentalClient {
                 .retrieve()
                 .body(RentalAgreementDigest.class);
     }
+
+    public String toolRentalCheckoutExportToConsole(final RentalAgreementDigest request) {
+        return restClient.post()
+                .uri("/v1/inventory/checkout:export")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .body(String.class);
+    }
 }

@@ -38,6 +38,16 @@ class InventoryControllerIT {
 
     private RentalClient client;
 
+    private static void verify(final CheckoutRequest request, final RentalAgreementDigest rentalAgreement) {
+        ToolCode toolCode = request.toolCode();
+        assertThat(rentalAgreement.getToolCode(), is(toolCode));
+        assertThat(rentalAgreement.getToolType(), is(toolCode.getToolType()));
+        assertThat(rentalAgreement.getToolBrand(), is(toolCode.getBrand()));
+        assertThat(rentalAgreement.getRentalDayCount(), is(request.rentalDayCount()));
+        assertThat(rentalAgreement.getCheckoutDate(), is(request.checkoutDate()));
+        assertThat(rentalAgreement.getDiscountPercent(), is(request.discountPercent()));
+    }
+
     @BeforeEach
     void setUp() {
         client = new RentalClient("localhost", port);
@@ -255,13 +265,14 @@ class InventoryControllerIT {
         assertThat(exception.getMessage(), containsString("1 already checked out on 2015-09-03"));
     }
 
-    private void verify(final CheckoutRequest request, final RentalAgreementDigest rentalAgreement) {
-        ToolCode toolCode = request.toolCode();
-        assertThat(rentalAgreement.getToolCode(), is(toolCode));
-        assertThat(rentalAgreement.getToolType(), is(toolCode.getToolType()));
-        assertThat(rentalAgreement.getToolBrand(), is(toolCode.getBrand()));
-        assertThat(rentalAgreement.getRentalDayCount(), is(request.rentalDayCount()));
-        assertThat(rentalAgreement.getCheckoutDate(), is(request.checkoutDate()));
-        assertThat(rentalAgreement.getDiscountPercent(), is(request.discountPercent()));
+    @Test
+    void toolRentalCheckoutExportToConsole() {
+        LocalDate checkoutDate = LocalDate.of(2024, 7, 12);
+        CheckoutRequest request = new CheckoutRequest(ToolCode.JAKR, checkoutDate, 3, 13, STORE_ID, null);
+
+        RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
+        String consoleMessage = client.toolRentalCheckoutExportToConsole(rentalAgreement);
+
+        assertThat(consoleMessage, containsString("Discount percent: 13%"));
     }
 }

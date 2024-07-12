@@ -7,6 +7,7 @@ import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.enumeration.ToolType;
 import com.tools.rental.exception.InvalidRequestException;
 import com.tools.rental.exception.NotFoundException;
+import com.tools.rental.mapper.RentalAgreementDigestMapper;
 import com.tools.rental.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,6 +36,7 @@ public class InventoryController {
             @ApiResponse(responseCode = "200", description = "Get store ToolType charge"), //
             @ApiResponse(responseCode = "404", description = "store ToolType charge not found")})
     @GetMapping(value = "/stores/{storeId}/{toolType}", produces = "application/json")
+    @ResponseStatus(code = HttpStatus.OK)
     public StoreToolTypeChargeDigest findByStoreIdAndToolType(@PathVariable("storeId") final Short storeId,
                                                               @PathVariable("toolType") final ToolType toolType)
             throws NotFoundException {
@@ -53,7 +55,7 @@ public class InventoryController {
     }
 
     @Operation(summary = "Delete store ToolType charge")
-    @ApiResponses(value = { //
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Store ToolType charge deleted")})
     @DeleteMapping(value = "/stores/{storeId}/{toolType}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
@@ -64,7 +66,7 @@ public class InventoryController {
 
     @Operation(summary = "Checkout tool rental")
     @ApiResponses(value = { //
-            @ApiResponse(responseCode = "200", description = "Successfully created tool rental"), //
+            @ApiResponse(responseCode = "201", description = "Successfully created tool rental"), //
             @ApiResponse(responseCode = "400", description = "Invalid request"),
             @ApiResponse(responseCode = "404", description = "store ToolType charge not found")})
     @PostMapping(value = "/checkout", produces = "application/json")
@@ -72,5 +74,16 @@ public class InventoryController {
     public RentalAgreementDigest toolRentalCheckout(@RequestBody final CheckoutRequest request)
             throws InvalidRequestException, NotFoundException {
         return inventoryService.toolRentalCheckout(request);
+    }
+
+    @Operation(summary = "Convert checkout tool rental to formatted console message")
+    @ApiResponses(value = { //
+            @ApiResponse(responseCode = "200", description = "Successfully created tool rental"), //
+            @ApiResponse(responseCode = "400", description = "Invalid request")})
+    @PostMapping(value = "/checkout:export", produces = "text/plain")
+    @ResponseStatus(code = HttpStatus.OK)
+    public String toolRentalCheckoutExportToConsole(@RequestBody final RentalAgreementDigest request)
+            throws InvalidRequestException {
+        return RentalAgreementDigestMapper.toConsole(request);
     }
 }

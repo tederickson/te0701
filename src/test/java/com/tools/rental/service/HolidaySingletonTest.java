@@ -11,6 +11,33 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.fail;
 
 class HolidaySingletonTest {
+    @Test
+    void verifyHolidayListGeneratedOnce() {
+        HolidaySingleton.getInstance().getHolidays(LocalDate.now());
+        List<LocalDate> holidays = HolidaySingleton.getInstance().getHolidays(LocalDate.now());
+
+        assertThat(holidays, hasSize(2));
+    }
+
+    @Test
+    void getHolidays2025() {
+        LocalDate checkoutDate = LocalDate.of(2025, 3, 4);
+        List<LocalDate> holidays = HolidaySingleton.getInstance().getHolidays(checkoutDate);
+
+        assertThat(holidays, hasSize(2));
+        for (var holiday : holidays) {
+            switch (holiday.getMonth()) {
+                case JULY:
+                    assertThat(holiday.getDayOfMonth(), is(4));
+                    break;
+                case SEPTEMBER:
+                    assertThat(holiday.getDayOfMonth(), is(1));
+                    break;
+                default:
+                    fail();
+            }
+        }
+    }
 
     @Test
     void getHolidays2024() {
@@ -102,6 +129,46 @@ class HolidaySingletonTest {
                     break;
                 case SEPTEMBER:
                     assertThat(holiday.getDayOfMonth(), is(7));
+                    break;
+                default:
+                    fail();
+            }
+        }
+    }
+
+    @Test
+    void getHolidays2019() {
+        LocalDate checkoutDate = LocalDate.of(2019, 3, 4);
+        List<LocalDate> holidays = HolidaySingleton.getInstance().getHolidays(checkoutDate);
+
+        assertThat(holidays, hasSize(2));
+        for (var holiday : holidays) {
+            switch (holiday.getMonth()) {
+                case JULY:
+                    assertThat(holiday.getDayOfMonth(), is(4));
+                    break;
+                case SEPTEMBER:
+                    assertThat(holiday.getDayOfMonth(), is(2));
+                    break;
+                default:
+                    fail();
+            }
+        }
+    }
+
+    @Test
+    void getHolidays2018() {
+        LocalDate checkoutDate = LocalDate.of(2018, 3, 4);
+        List<LocalDate> holidays = HolidaySingleton.getInstance().getHolidays(checkoutDate);
+
+        assertThat(holidays, hasSize(2));
+        for (var holiday : holidays) {
+            switch (holiday.getMonth()) {
+                case JULY:
+                    assertThat(holiday.getDayOfMonth(), is(4));
+                    break;
+                case SEPTEMBER:
+                    assertThat(holiday.getDayOfMonth(), is(3));
                     break;
                 default:
                     fail();

@@ -140,8 +140,12 @@ class InventoryControllerIT {
         RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
         verify(request, rentalAgreement);
 
-        LocalDate dueDate = LocalDate.of(2000, 7, 2 + 3 - 1);
-        assertThat(rentalAgreement.getDueDate(), is(dueDate));
+        assertThat(rentalAgreement.getDueDate(), is(checkoutDate.plusDays(request.rentalDayCount())));
+
+        // 7/2/2000 Sunday
+        // 7/3/2000 Monday
+        // 7/4/2000 Holiday -- no charge
+        assertThat(rentalAgreement.getChargeDays(), is(2));
     }
 
     @Test
@@ -151,6 +155,16 @@ class InventoryControllerIT {
 
         RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
         verify(request, rentalAgreement);
+
+        LocalDate dueDate = checkoutDate.plusDays(request.rentalDayCount());
+        assertThat(rentalAgreement.getDueDate(), is(dueDate));
+
+        // 7/2/2015 Thursday
+        // 7/3/2015 Friday -- observed Holiday, still charged
+        // 7/4/2015 Saturday -- no charge
+        // 7/5/2015 Sunday -- no charge
+        // 7/6/2015 Monday
+        assertThat(rentalAgreement.getChargeDays(), is(3));
     }
 
     @Test
@@ -160,6 +174,17 @@ class InventoryControllerIT {
 
         RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
         verify(request, rentalAgreement);
+
+        LocalDate dueDate = checkoutDate.plusDays(request.rentalDayCount());
+        assertThat(rentalAgreement.getDueDate(), is(dueDate));
+
+        // 9/3/2015 Thursday
+        // 9/4/2015 Friday
+        // 9/5/2015 Saturday -- no charge
+        // 9/6/2015 Sunday -- no charge
+        // 9/7/2015 Holiday -- no charge
+        // 9/8/2015 Tuesday
+        assertThat(rentalAgreement.getChargeDays(), is(3));
     }
 
     @Test
@@ -169,6 +194,20 @@ class InventoryControllerIT {
 
         RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
         verify(request, rentalAgreement);
+
+        LocalDate dueDate = checkoutDate.plusDays(request.rentalDayCount());
+        assertThat(rentalAgreement.getDueDate(), is(dueDate));
+
+        // 7/2/2015 Thursday
+        // 7/3/2015 Friday -- observed Holiday, no charge
+        // 7/4/2015 Saturday -- no charge
+        // 7/5/2015 Sunday -- no charge
+        // 7/6/2015 Monday
+        // 7/7/2015 Tuesday
+        // 7/8/2015 Wednesday
+        // 7/9/2015 Thursday
+        // 7/10/2015 Friday
+        assertThat(rentalAgreement.getChargeDays(), is(6));
     }
 
     @Test
@@ -178,6 +217,14 @@ class InventoryControllerIT {
 
         RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
         verify(request, rentalAgreement);
+
+        assertThat(rentalAgreement.getDueDate(), is(checkoutDate.plusDays(request.rentalDayCount())));
+
+        // 7/2/2000 Sunday -- no charge
+        // 7/3/2000 Monday
+        // 7/4/2000 Holiday -- no charge
+        // 7/5/2000 Wednesday
+        assertThat(rentalAgreement.getChargeDays(), is(2));
     }
 
     private void verify(final CheckoutRequest request, final RentalAgreementDigest rentalAgreement) {

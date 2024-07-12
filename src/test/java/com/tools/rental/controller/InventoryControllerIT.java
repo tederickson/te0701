@@ -242,6 +242,19 @@ class InventoryControllerIT {
         assertThat(rentalAgreement.getFinalCharge(), is(new BigDecimal("2.99")));
     }
 
+    @Test
+    void toolRentalCheckout_exceedsInventory() {  // Test 4
+        LocalDate checkoutDate = LocalDate.of(2015, 9, 3);
+        CheckoutRequest request = new CheckoutRequest(ToolCode.JAKD, checkoutDate, 3, 0, STORE_ID, null);
+
+        RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
+        verify(request, rentalAgreement);
+
+        var exception = assertThrows(HttpClientErrorException.BadRequest.class,
+                                     () -> client.toolRentalCheckout(request));
+        assertThat(exception.getMessage(), containsString("1 already checked out on 2015-09-03"));
+    }
+
     private void verify(final CheckoutRequest request, final RentalAgreementDigest rentalAgreement) {
         ToolCode toolCode = request.toolCode();
         assertThat(rentalAgreement.getToolCode(), is(toolCode));

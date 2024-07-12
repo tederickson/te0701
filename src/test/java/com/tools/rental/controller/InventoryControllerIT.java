@@ -211,7 +211,7 @@ class InventoryControllerIT {
     }
 
     @Test
-    void toolRentalCheckout_julyHoliday6() {  // Test 6
+    void toolRentalCheckout_HolidayAndWeekendFree() {  // Test 6
         LocalDate checkoutDate = LocalDate.of(2000, 7, 2);
         CheckoutRequest request = new CheckoutRequest(ToolCode.JAKR, checkoutDate, 4, 50, STORE_ID, null);
 

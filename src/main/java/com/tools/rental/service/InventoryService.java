@@ -20,7 +20,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -65,15 +68,16 @@ public class InventoryService {
         validate(request);
 
         final ToolCode toolCode = request.toolCode();
+        final ToolType toolType = toolCode.getToolType();
         final var rentalAgreementBuilder = RentalAgreementDigest.builder()
                 .withToolCode(toolCode)
-                .withToolType(toolCode.getToolType())
+                .withToolType(toolType)
                 .withToolBrand(toolCode.getBrand())
                 .withRentalDayCount(request.rentalDayCount())
                 .withCheckoutDate(request.checkoutDate())
                 .withDiscountPercent(request.discountPercent());
 
-        LocalDate dueDate = request.checkoutDate().plusDays(request.rentalDayCount() - 1);
+        LocalDate dueDate = request.checkoutDate().plusDays(request.rentalDayCount());
         rentalAgreementBuilder.withDueDate(dueDate);
 
         BigDecimal dailyCharge =
@@ -86,17 +90,12 @@ public class InventoryService {
                 .map(StoreToolInventory::getMaxAvailable)
                 .orElseThrow(() -> new NotFoundException("toolCode for store"));
 
+        int chargeDays = 0;
+        List<LocalDate> holidays = HolidaySingleton.getInstance().getHolidays(request.checkoutDate());
+
         for (int day = 0; day < request.rentalDayCount(); day++) {
             LocalDate checkoutDate = request.checkoutDate().plusDays(day);
-            int rentals = storeToolRentalRepository.findByStoreIdAndToolCodeAndCheckoutDate(request.storeId(),
-                                                                                            toolCode,
-                                                                                            checkoutDate)
-                    .stream()
-                    .mapToInt(StoreToolRental::getAmount)
-                    .sum();
-            if (rentals + 1 > maxAvailable) {
-                throw new InvalidRequestException(rentals + " already checked out on " + checkoutDate);
-            }
+            verifyToolAvailable(request, toolCode, checkoutDate, maxAvailable);
 
             StoreToolRental storeToolRental = new StoreToolRental()
                     .setToolCode(toolCode)
@@ -105,12 +104,49 @@ public class InventoryService {
                     .setAmount((short) 1)
                     .setCustomerId(request.customerId());
             storeToolRentalRepository.save(storeToolRental);
+
+            if (isChargeable(toolType, checkoutDate, holidays)) {
+                chargeDays++;
+            }
         }
+        rentalAgreementBuilder.withChargeDays(chargeDays);
 
         return rentalAgreementBuilder.build();
     }
 
-    private void validate(CheckoutRequest request) throws InvalidRequestException {
+
+    private boolean isChargeable(final ToolType toolType,
+                                 final LocalDate checkoutDate,
+                                 final List<LocalDate> holidays) {
+        DayOfWeek day = DayOfWeek.of(checkoutDate.get(ChronoField.DAY_OF_WEEK));
+
+        if (day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY) {
+            return toolType.getWeekendCharge();
+        }
+
+        if (holidays.contains(checkoutDate)) {
+            return toolType.getHolidayCharge();
+        }
+
+        return toolType.getWeekdayCharge();
+    }
+
+    private void verifyToolAvailable(final CheckoutRequest request,
+                                     final ToolCode toolCode,
+                                     final LocalDate checkoutDate,
+                                     final int maxAvailable) throws InvalidRequestException {
+        int rentals = storeToolRentalRepository.findByStoreIdAndToolCodeAndCheckoutDate(request.storeId(),
+                                                                                        toolCode,
+                                                                                        checkoutDate)
+                .stream()
+                .mapToInt(StoreToolRental::getAmount)
+                .sum();
+        if (rentals + 1 > maxAvailable) {
+            throw new InvalidRequestException(rentals + " already checked out on " + checkoutDate);
+        }
+    }
+
+    private void validate(final CheckoutRequest request) throws InvalidRequestException {
         if (request.rentalDayCount() < 1) {
             throw new InvalidRequestException("Must rent tool for at least one day");
         }

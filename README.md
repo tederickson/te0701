@@ -81,6 +81,7 @@ There are multiple ways to handle making the application secure.
 * The UI could talk to Firebase to handle user authentication
 * Use OAuth or SAML
 * Roll your own framework and use the request filter chain to check for the presence of a valid header
+* Grovel before Google and choose a different option
 
 ## Audit
 Auditing is a future requirement.
@@ -94,3 +95,4 @@ Unfortunately table data only shows the final time a row was updated.  Audit eve
 # Future Enhancements
 1. Provide a sale endpoint that allows a manager to reduce the price of a tool code for a specified period of days.
 2. Provide a tool maintenance/repair endpoint to allow temporary inventory reduction while a tool is in the shop.
+3. Allow customer to rent multiple ladders at one time instead of making multiple checkout requests.

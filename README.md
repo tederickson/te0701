@@ -91,8 +91,8 @@ Store administration is not part of this project.
 ![databaseSchema.png](databaseSchema.png)
 
 ## Run the Application
-
-Run the following command in a terminal window:
+1. Uncomment and provide the MySql password in src/main/resources/application-dev.properties
+2. Run the following command in a terminal window:
 
 ```bash
 mvn spring-boot:run -Dspring-boot.run.profiles=dev

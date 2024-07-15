@@ -10,6 +10,24 @@ Fun project to set up renting tools at Home Depot or Lowes.
 4. Clerk may give repeat customers a discount that is applied to the total daily charges to reduce the final charge.
 5. REST API only
 
+# Scenarios 
+## Customer does not have an account
+1. Customer checks out a tool
+2. Clerk makes a random decision about the customer discount
+3. Application calls /v1/inventory/checkout
+   * Tool code
+   * Rental day count
+   * Discount percent
+   * Check out date
+4. Console displays the rental agreement by calling /v1/inventory/checkout:export
+
+## Customer creates an account (via website or phone app)
+1. Application calls /v1/customers
+    * Phone
+    * First name
+    * Last name
+    * Email
+    * Password
 
 ## Config
 The application.properties file is stored in Git.  

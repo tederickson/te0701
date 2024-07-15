@@ -33,8 +33,8 @@ public class CustomerService {
                 .setPhone(request.phone())
                 .setEmail(request.email())
                 .setCreateDate(LocalDate.now())
-                .setStatus(CustomerStatus.NEW)
-                .setPassword("customer needs to change");
+                .setStatus(CustomerStatus.ACTIVE)
+                .setPassword(request.password());
 
         return CustomerDigestMapper.map(customerRepository.save(customer));
     }
@@ -44,6 +44,9 @@ public class CustomerService {
         if (request.phone().length() != 10) {throw new InvalidRequestException("Phone format");}
         if (StringUtils.isBlank(request.firstName())) {throw new InvalidRequestException("Missing first name");}
         if (StringUtils.isBlank(request.lastName())) {throw new InvalidRequestException("Missing last name");}
+        if (PasswordValidator.isNotValid(request.password())) {
+            throw new InvalidRequestException(RentalServiceError.INVALID_PASSWORD);
+        }
     }
 
     public CustomerDigest getCustomerByPhone(final String phone) throws InvalidRequestException, NotFoundException {

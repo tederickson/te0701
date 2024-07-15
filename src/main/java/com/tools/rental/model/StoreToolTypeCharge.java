@@ -47,11 +47,11 @@ public class StoreToolTypeCharge {
             return false;
         }
         StoreToolTypeCharge storeToolTypeCharge = (StoreToolTypeCharge) o;
-        return id == storeToolTypeCharge.id;
+        return getId() == storeToolTypeCharge.getId();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 }

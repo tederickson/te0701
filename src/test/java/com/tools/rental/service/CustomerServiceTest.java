@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 class CustomerServiceTest {
     private static final String PHONE = "8015551234";
+    final private static String PASSWORD = "Val!d2024Password";
 
     private CustomerRepository customerRepository;
 
@@ -34,7 +35,7 @@ class CustomerServiceTest {
 
     @Test
     void createCustomer_invalidPhone() {
-        CreateCustomerRequest request = new CreateCustomerRequest(null, "", "", null);
+        CreateCustomerRequest request = new CreateCustomerRequest(null, "", "", null, PASSWORD);
         var exception = assertThrows(InvalidRequestException.class, () -> customerService.createCustomer(request));
 
         assertThat(exception.getMessage(), is("Missing phone"));
@@ -42,7 +43,7 @@ class CustomerServiceTest {
 
     @Test
     void createCustomer_invalidPhoneFormat() {
-        CreateCustomerRequest request = new CreateCustomerRequest("12", "", "", null);
+        CreateCustomerRequest request = new CreateCustomerRequest("12", "", "", null, PASSWORD);
         var exception = assertThrows(InvalidRequestException.class, () -> customerService.createCustomer(request));
 
         assertThat(exception.getMessage(), is("Phone format"));
@@ -50,7 +51,7 @@ class CustomerServiceTest {
 
     @Test
     void createCustomer_invalidFirstName() {
-        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "", "", null);
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "", "", null, PASSWORD);
         var exception = assertThrows(InvalidRequestException.class, () -> customerService.createCustomer(request));
 
         assertThat(exception.getMessage(), is("Missing first name"));
@@ -58,7 +59,7 @@ class CustomerServiceTest {
 
     @Test
     void createCustomer_invalidLastName() {
-        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "Bob", "", null);
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "Bob", "", null, PASSWORD);
         var exception = assertThrows(InvalidRequestException.class, () -> customerService.createCustomer(request));
 
         assertThat(exception.getMessage(), is("Missing last name"));
@@ -68,7 +69,7 @@ class CustomerServiceTest {
     void createCustomer_customerNotFound() {
         when(customerRepository.findByPhone(PHONE)).thenReturn(Optional.of(new Customer()));
 
-        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "Bob", "Test", null);
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "Bob", "Test", null, PASSWORD);
         var exception = assertThrows(InvalidRequestException.class, () -> customerService.createCustomer(request));
 
         assertThat(exception.getMessage(), is("User exists."));

@@ -53,11 +53,11 @@ public class Customer {
             return false;
         }
         Customer customer = (Customer) o;
-        return id == customer.id;
+        return getId() == customer.getId();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 }

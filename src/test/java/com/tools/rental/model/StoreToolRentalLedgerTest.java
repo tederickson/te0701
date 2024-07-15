@@ -1,37 +1,36 @@
 package com.tools.rental.model;
 
+import com.tools.rental.enumeration.ToolCode;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class CustomerTest {
-    private static final Customer CUSTOMER = new Customer().setId(123L).setPhone("12321").setPassword("password");
+class StoreToolRentalLedgerTest {
+    private static final long ID = 123L;
+    private static final StoreToolRentalLedger STORE_TOOL_RENTAL =
+            new StoreToolRentalLedger().setId(ID)
+                    .setStoreId((short) 1)
+                    .setToolCode(ToolCode.JAKD);
 
     @Test
     void shouldHaveNoArgsConstructor() {
-        assertThat(Customer.class, hasValidBeanConstructor());
+        assertThat(StoreToolRentalLedger.class, hasValidBeanConstructor());
     }
 
     @Test
     void equalsAndHashCode() {
-        EqualsVerifier.simple().forClass(Customer.class)
+        EqualsVerifier.simple().forClass(StoreToolRentalLedger.class)
                 .suppress(Warning.NONFINAL_FIELDS)
                 .suppress(Warning.SURROGATE_KEY)
                 .verify();
     }
 
     @Test
-    void getPassword() {
-        assertEquals("password", CUSTOMER.getPassword());
-    }
-
-    @Test
     void testToString() {
-        assertNotNull(CUSTOMER.toString());
+        assertNotNull(STORE_TOOL_RENTAL.toString());
     }
 }

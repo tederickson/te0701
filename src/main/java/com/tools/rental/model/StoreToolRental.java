@@ -53,11 +53,11 @@ public class StoreToolRental {
             return false;
         }
         StoreToolRental storeToolInventory = (StoreToolRental) o;
-        return id == storeToolInventory.id;
+        return getId() == storeToolInventory.getId();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 }

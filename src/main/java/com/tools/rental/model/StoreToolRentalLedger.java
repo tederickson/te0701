@@ -75,11 +75,11 @@ public class StoreToolRentalLedger {
             return false;
         }
         StoreToolRentalLedger storeToolRentalLedger = (StoreToolRentalLedger) o;
-        return id == storeToolRentalLedger.id;
+        return getId() == storeToolRentalLedger.getId();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(getId());
     }
 }

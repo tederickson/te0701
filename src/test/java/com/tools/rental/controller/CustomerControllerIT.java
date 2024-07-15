@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CustomerControllerIT {
     final private static String PHONE = "test phone";
+    final private static String PASSWORD = "Val!d2024Password";
 
     @LocalServerPort
     private int port;
@@ -40,7 +41,7 @@ class CustomerControllerIT {
 
     @Test
     void createCustomer() {
-        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first", "last", "email");
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first", "last", "email", PASSWORD);
         CustomerDigest customer = client.createCustomer(request);
 
         validate(customer, "first", "last");
@@ -48,15 +49,23 @@ class CustomerControllerIT {
 
     @Test
     void createCustomer_invalidPhone() {
-        CreateCustomerRequest request = new CreateCustomerRequest("phone", "first", "last", "email");
+        CreateCustomerRequest request = new CreateCustomerRequest("phone", "first", "last", "email", PASSWORD);
 
         var exception = assertThrows(HttpClientErrorException.BadRequest.class, () -> client.createCustomer(request));
         assertThat(exception.getMessage(), containsString("Phone format"));
     }
 
     @Test
+    void createCustomer_invalidPassword() {
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first", "last", "email", "PASSWORD");
+
+        var exception = assertThrows(HttpClientErrorException.BadRequest.class, () -> client.createCustomer(request));
+        assertThat(exception.getMessage(), containsString("Invalid password"));
+    }
+
+    @Test
     void createCustomer_customerExist() {
-        CreateCustomerRequest request = new CreateCustomerRequest("7195551234", "first", "last", "email");
+        CreateCustomerRequest request = new CreateCustomerRequest("7195551234", "first", "last", "email", PASSWORD);
 
         var exception = assertThrows(HttpClientErrorException.BadRequest.class, () -> client.createCustomer(request));
         assertThat(exception.getMessage(), containsString(RentalServiceError.EXISTING_USER.getMessage()));
@@ -64,7 +73,7 @@ class CustomerControllerIT {
 
     @Test
     void getCustomerByPhone() {
-        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first1", "last1", "email");
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first1", "last1", "email", PASSWORD);
         client.createCustomer(request);
 
         CustomerDigest customer = client.getCustomerByPhone(PHONE);
@@ -74,7 +83,7 @@ class CustomerControllerIT {
 
     @Test
     void changePassword() {
-        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first", "last", "email");
+        CreateCustomerRequest request = new CreateCustomerRequest(PHONE, "first", "last", "email", PASSWORD);
         CustomerDigest customer = client.createCustomer(request);
 
         ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest("12AppleSauce!");
@@ -97,7 +106,7 @@ class CustomerControllerIT {
         assertThat(customer.getPhone(), is(PHONE));
         assertThat(customer.getFirstName(), is(first));
         assertThat(customer.getLastName(), is(last));
-        assertThat(customer.getStatus(), is(CustomerStatus.NEW));
+        assertThat(customer.getStatus(), is(CustomerStatus.ACTIVE));
         assertThat(customer.getEmail(), is("email"));
     }
 }

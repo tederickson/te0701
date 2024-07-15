@@ -14,7 +14,7 @@ Fun project to set up renting tools at Home Depot or Lowes.
 
 # Scenarios
 
-## Customer does not have an account
+## Customer checkout does not have an account
 
 1. Customer checks out a tool
 2. Clerk makes a random decision about the customer discount
@@ -39,13 +39,14 @@ Fun project to set up renting tools at Home Depot or Lowes.
 1. Application calls /v1/customers/{id}/change-password
    * password
 
-## Customer does have an account
+## Customer checkout does have an account
 
 1. Customer checks out a tool
 2. Customer or clerk enters phone number
 3. Application calls /v1/customers/{phone}
 4. Clerk terminal displays customers name
-5. Application displays brief history of most recent transactions by calling /v1/customers/{id}/history
+5. Application displays brief history of most recent transactions by calling 
+      /v1/inventory/stores/{storeId}/customers/{customerId}/pageNo/{pageNo}/pageSize/{pageSize}
 6. Clerk makes an informed decision about the customer discount based on account history
 7. Application calls /v1/inventory/checkout
     * Tool code

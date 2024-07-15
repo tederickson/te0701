@@ -103,4 +103,15 @@ public class RentalClient {
                 .retrieve()
                 .body(String.class);
     }
+
+    public List<RentalAgreementDigest> findByStoreIdAndCustomerId(final short storeId,
+                                                                  final long customerId,
+                                                                  final int pageNo,
+                                                                  final int pageSize) {
+        return restClient.get()
+                .uri("/v1/inventory/stores/{storeId}/customers/{customerId}/pageNo/{pageNo}/pageSize/{pageSize}",
+                     storeId, customerId, pageNo, pageSize)
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {});
+    }
 }

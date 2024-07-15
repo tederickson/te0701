@@ -14,6 +14,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -85,5 +89,21 @@ public class InventoryController {
     public String toolRentalCheckoutExportToConsole(@RequestBody final RentalAgreementDigest request)
             throws InvalidRequestException {
         return RentalAgreementDigestMapper.toConsole(request);
+    }
+
+    @Operation(summary = "Display a history of most recent transactions by using StoreId and CustomerId")
+    @ApiResponses(value = { //
+            @ApiResponse(responseCode = "200", description = "Get matching transactions"), //
+            @ApiResponse(responseCode = "404", description = "invalid store or customer id")})
+    @GetMapping(value = "/stores/{storeId}/customers/{customerId}/pageNo/{pageNo}/pageSize/{pageSize}",
+            produces = "application/json")
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<RentalAgreementDigest> findByStoreIdAndCustomerId(@PathVariable("storeId") final Short storeId,
+                                                                  @PathVariable("customerId") final long customerId,
+                                                                  @PathVariable("pageNo") final int pageNo,
+                                                                  @PathVariable("pageSize") final int pageSize)
+            throws InvalidRequestException {
+        final Pageable pageable = PageRequest.of(pageNo, pageSize);
+        return inventoryService.findByStoreIdAndCustomerId(storeId, customerId, pageable);
     }
 }

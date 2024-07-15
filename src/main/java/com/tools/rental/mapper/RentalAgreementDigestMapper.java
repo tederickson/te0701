@@ -97,4 +97,21 @@ public class RentalAgreementDigestMapper {
                 .setDiscountAmount(rentalAgreementDigest.getDiscountAmount())
                 .setFinalCharge(rentalAgreementDigest.getFinalCharge());
     }
+
+    public static RentalAgreementDigest map(final StoreToolRentalLedger ledger) {
+        return RentalAgreementDigest.builder()
+                .withToolCode(ledger.getToolCode())
+                .withToolType(ledger.getToolCode().getToolType())
+                .withToolBrand(ledger.getToolCode().getBrand())
+                .withRentalDayCount(ledger.getRentalDayCount())
+                .withCheckoutDate(ledger.getCheckoutDate())
+                .withDueDate(ledger.getDueDate())
+                .withDailyRentalCharge(ledger.getDailyRentalCharge())
+                .withChargeDays(ledger.getChargeDays())
+                .withPreDiscountCharge(ledger.getPreDiscountCharge())
+                .withDiscountPercent(ledger.getDiscountPercent())
+                .withDiscountAmount(ledger.getDiscountAmount())
+                .withFinalCharge(ledger.getFinalCharge())
+                .build();
+    }
 }

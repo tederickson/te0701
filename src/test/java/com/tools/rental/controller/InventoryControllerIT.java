@@ -3,6 +3,7 @@ package com.tools.rental.controller;
 import com.tools.rental.client.RentalClient;
 import com.tools.rental.domain.CheckoutRequest;
 import com.tools.rental.domain.CreateStoreToolTypeChargeRequest;
+import com.tools.rental.domain.CustomerDigest;
 import com.tools.rental.domain.RentalAgreementDigest;
 import com.tools.rental.domain.StoreToolTypeChargeDigest;
 import com.tools.rental.enumeration.ToolCode;
@@ -20,16 +21,21 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class InventoryControllerIT {
     final private static short STORE_ID = 1;
+    final private static String PHONE = "8015551234";
 
     @LocalServerPort
     private int port;
@@ -49,6 +55,19 @@ class InventoryControllerIT {
         assertThat(rentalAgreement.getRentalDayCount(), is(request.rentalDayCount()));
         assertThat(rentalAgreement.getCheckoutDate(), is(request.checkoutDate()));
         assertThat(rentalAgreement.getDiscountPercent(), is(request.discountPercent()));
+    }
+
+    private static void verifyDescendingOrder(final List<RentalAgreementDigest> rentals) {
+        Iterator<RentalAgreementDigest> itr = rentals.iterator();
+
+        RentalAgreementDigest previous = itr.next();
+        while (itr.hasNext()) {
+            RentalAgreementDigest current = itr.next();
+
+            assertTrue(previous.getCheckoutDate().isAfter(current.getCheckoutDate()));
+
+            previous = current;
+        }
     }
 
     @BeforeEach
@@ -278,5 +297,35 @@ class InventoryControllerIT {
         String consoleMessage = client.toolRentalCheckoutExportToConsole(rentalAgreement);
 
         assertThat(consoleMessage, containsString("Discount percent: 13%"));
+    }
+
+    @Test
+    void customerToolRentalHistory() {
+        CustomerDigest customer = client.getCustomerByPhone(PHONE);
+        LocalDate checkoutDate = LocalDate.of(2000, 7, 2);
+
+        for (int month = 0; month < 12; month++) {
+            CheckoutRequest request = new CheckoutRequest(ToolCode.JAKR,
+                                                          checkoutDate.minusMonths(month), 4, month, STORE_ID,
+                                                          customer.getId());
+
+            RentalAgreementDigest rentalAgreement = client.toolRentalCheckout(request);
+            verify(request, rentalAgreement);
+        }
+
+        int pageNo = 0;
+        int pageSize = 20;
+        List<RentalAgreementDigest> rentals = client.findByStoreIdAndCustomerId(STORE_ID, customer.getId(),
+                                                                                pageNo, pageSize);
+        assertThat(rentals, hasSize(12));
+        verifyDescendingOrder(rentals);
+        assertThat(rentals.getFirst().getCheckoutDate(), is(checkoutDate));
+
+        pageSize = 5;
+        rentals = client.findByStoreIdAndCustomerId(STORE_ID, customer.getId(),
+                                                    pageNo, pageSize);
+        assertThat(rentals, hasSize(pageSize));
+        verifyDescendingOrder(rentals);
+        assertThat(rentals.getFirst().getCheckoutDate(), is(checkoutDate));
     }
 }

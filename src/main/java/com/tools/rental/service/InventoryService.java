@@ -19,6 +19,7 @@ import com.tools.rental.repository.StoreToolRentalLedgerRepository;
 import com.tools.rental.repository.StoreToolRentalRepository;
 import com.tools.rental.repository.StoreToolTypeChargeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoField;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -188,6 +190,17 @@ public class InventoryService {
         storeToolRentalLedgerRepository.save(storeToolRentalLedger);
 
         return rentalAgreementDigest;
+    }
+
+    public List<RentalAgreementDigest> findByStoreIdAndCustomerId(final Short storeId,
+                                                                  final long customerId,
+                                                                  final Pageable pageable) throws InvalidRequestException {
+        validateStoreId(storeId);
+        return storeToolRentalLedgerRepository.findAllByStoreIdAndCustomerIdOrderByCheckoutDateDesc(storeId,
+                                                                                                    customerId,
+                                                                                                    pageable)
+                .stream().map(RentalAgreementDigestMapper::map)
+                .collect(Collectors.toList());
     }
 
     private void verifyToolAvailable(final CheckoutRequest request,

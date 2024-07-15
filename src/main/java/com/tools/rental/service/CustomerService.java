@@ -20,6 +20,16 @@ import java.time.LocalDate;
 public class CustomerService {
     private final CustomerRepository customerRepository;
 
+    private static void validate(CreateCustomerRequest request) throws InvalidRequestException {
+        if (StringUtils.isBlank(request.phone())) {throw new InvalidRequestException("Missing phone");}
+        if (request.phone().length() != 10) {throw new InvalidRequestException("Phone format");}
+        if (StringUtils.isBlank(request.firstName())) {throw new InvalidRequestException("Missing first name");}
+        if (StringUtils.isBlank(request.lastName())) {throw new InvalidRequestException("Missing last name");}
+        if (PasswordValidator.isNotValid(request.password())) {
+            throw new InvalidRequestException(RentalServiceError.INVALID_PASSWORD);
+        }
+    }
+
     public CustomerDigest createCustomer(final CreateCustomerRequest request) throws InvalidRequestException {
         validate(request);
 
@@ -37,16 +47,6 @@ public class CustomerService {
                 .setPassword(request.password());
 
         return CustomerDigestMapper.map(customerRepository.save(customer));
-    }
-
-    private void validate(CreateCustomerRequest request) throws InvalidRequestException {
-        if (StringUtils.isBlank(request.phone())) {throw new InvalidRequestException("Missing phone");}
-        if (request.phone().length() != 10) {throw new InvalidRequestException("Phone format");}
-        if (StringUtils.isBlank(request.firstName())) {throw new InvalidRequestException("Missing first name");}
-        if (StringUtils.isBlank(request.lastName())) {throw new InvalidRequestException("Missing last name");}
-        if (PasswordValidator.isNotValid(request.password())) {
-            throw new InvalidRequestException(RentalServiceError.INVALID_PASSWORD);
-        }
     }
 
     public CustomerDigest getCustomerByPhone(final String phone) throws InvalidRequestException, NotFoundException {

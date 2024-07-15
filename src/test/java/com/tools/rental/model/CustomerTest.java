@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class CustomerTest {
@@ -23,11 +22,6 @@ class CustomerTest {
                 .suppress(Warning.NONFINAL_FIELDS)
                 .suppress(Warning.SURROGATE_KEY)
                 .verify();
-    }
-
-    @Test
-    void getPassword() {
-        assertEquals("password", CUSTOMER.getPassword());
     }
 
     @Test

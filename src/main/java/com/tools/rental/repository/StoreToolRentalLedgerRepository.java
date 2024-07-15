@@ -12,4 +12,6 @@ public interface StoreToolRentalLedgerRepository extends JpaRepository<StoreTool
     List<StoreToolRentalLedger> findAllByStoreIdAndCheckoutDateBetween(final short storeId,
                                                                        final LocalDate startDate,
                                                                        final LocalDate endDate);
+
+    List<StoreToolRentalLedger> findAllByStoreId(final short storeId);
 }

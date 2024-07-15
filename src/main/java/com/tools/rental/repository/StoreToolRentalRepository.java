@@ -13,4 +13,6 @@ public interface StoreToolRentalRepository extends JpaRepository<StoreToolRental
     List<StoreToolRental> findByStoreIdAndToolCodeAndCheckoutDate(final short storeId,
                                                                   final ToolCode toolCode,
                                                                   final LocalDate checkoutDate);
+
+    List<StoreToolRental> findByStoreId(final short storeId);
 }

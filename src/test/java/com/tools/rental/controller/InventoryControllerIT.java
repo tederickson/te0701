@@ -58,8 +58,8 @@ class InventoryControllerIT {
 
     @AfterEach
     void tearDown() {
-        storeToolRentalRepository.deleteAll();
-        storeToolRentalLedgerRepository.deleteAll();
+        storeToolRentalRepository.deleteAll(storeToolRentalRepository.findByStoreId(STORE_ID));
+        storeToolRentalLedgerRepository.deleteAll(storeToolRentalLedgerRepository.findAllByStoreId(STORE_ID));
     }
 
     @Test
